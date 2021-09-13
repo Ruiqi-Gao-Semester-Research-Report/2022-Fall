@@ -1,0 +1,170 @@
+%%
+%% This is file `sample-sigplan.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `sigplan')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigplan.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+\documentclass[sigplan,nonacm]{acmart}
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+	\providecommand\BibTeX{{%
+			\normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+%%\setcopyright{acmcopyright}
+\setcopyright{none}
+%%\copyrightyear{2018}
+%%\acmYear{2018}
+%%\acmDOI{10.1145/1122445.1122456}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+%%\acmConference[Woodstock '18]{Woodstock '18: ACM Symposium%% on Neural
+%%  Gaze Detection}{June 03--05, 2018}{Woodstock, NY}
+%%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%%  June 03--05, 2018, Woodstock, NY}
+%%\acmPrice{15.00}
+%%\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{CS59200 Research Proposal}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Ruiqi Gao}
+\email{gao606@purdue.edu}
+\affiliation{%
+  \institution{Purdue University}
+  \city{Lafayette}
+  \state{Indiana}
+  \country{USA}
+  \postcode{47901}
+}
+
+
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+%%\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+Various approaches have been developed like data parallelism, model parallelism, attribute parallelism, and pipeline parallelism to train machine learning models in parallel, however, there are no existing frameworks that can integrate these approaches together. Most commonly used machine learning frameworks such as TensorFlow and Pytorch only support a very small subset of parallel paradigms - the data parallelism and model parallelism. GPipe and PipeDream support different types of pipeline parallelism by dividing the model into several modules and run them in a pipeline fashion.
+AIRCop(Abstract IR for Comprehensive Parallelization) is a developing project that unifies all the parallelism paradigms mentioned above. Since all the machine learning models can be viewed as computation graphs, the parallelism paradigms (data parallelism, model parallelism, attribute parallelism, and pipeline parallelism) are just different kinds of computation graph transformation, ie transformation pass. AIRCop uses this idea and takes a machine learning model(basic sequential model) and parallelization annotations (describe the desired parallel behavior) as input and generates target program through different transformation passes.
+	
+\end{abstract}
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{Parallel Training, Graph Transformation, Machine Learning Frameworks, Pipeline Parallelism}
+
+
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Objective}
+I am trying to implement pipeline parallelism into a Parallelism Machine learning framework-AIRCop. If the project is done, AIRCop will be the first Machine learning framework that can integrate all parallel paradigms and users can have a deeper insight into parallel training design.
+
+\section{Current Work}
+There are currently several parallel strategies to run large models: Spatial Partition(data parallelism, model parallelism) and Pipelined Execution. Spatial Partition divides the computation of machine learning operations among different devices and runs them simultaneously. Pipelined Execution runs multiple batches of data in a pipelined fashion.\par
+ Spatial Partition is implemented in well-known machine learning frameworks like Tensorflow and Pytorch. GPipe and PipeDream support different kinds of pipeline parallelism. While Spatial Partition enables the model to be trained among multiple devices simultaneously each with a fraction of data, It will require a large number of device communication between operations and will result in inter-device tensor communication overhead. This turns out to be the bottleneck for parallel training on GPU clusters (group of devices) where inter-cluster communication does not have high bandwidth. Pipeline Execution is a better strategy for parallel training among clusters because it divides the model into several modules, runs different modules simultaneously in a pipelined fashion, and only requires tensor communication between modules. \par 
+ It will be ideal for large GPU clusters to use Spatial Partition inside the cluster(where devices have high-bandwidth connections) and Pipeline Execution between different clusters(with little communication overhead). However, there is currently no machine learning framework that can integrate both Spatial Partition and Pipeline Execution. 
+\section{Innovation}
+My project focuses on implementing pipeline parallelism on the AIRCop framework, thus enables AIRCop to be the first framework that can explore the full power of different Parallelism Paradigms. \par 
+ AIRCop also develops a formal language to describe the model as a computation graph, and the corresponding transformation procedure for generating the target parallel program for different parallelism paradigms. AIRCop comes with an annotation system for the user to specify what kind of Parallelism Paradigms they want to use: Spatial Partition annotation for operations and Pipelined Execution annotation for modules. Users can explore comprehensive parallel training by adding different annotations to the source model.
+ \section{Implementation and Risk}
+ The key idea to implement pipeline parallelism in AIRCop is to realize the corresponding computation graph transformation pass for different pipeline strategies and come up with an annotation system to represent different pipeline strategies.\par
+ The risk should be low because GPipe and Pipedream already separately implement different pipeline strategies as libraries and Spatial Partition is already implemented in AIRCop as a transformation pass.
+\section{Examination and Success metric}
+The first step is to formally describe stacked pipeline(GPipe's strategy) and queued pipeline(PipeDream's strategy) as transformation passes in the formal language of AIRCop, and decides the annotation system for the user to specify the strategy in the source program. \par
+The mid-term exam will be to implement stacked pipeline inside LMS compiler as a transformation pass for single pipeline parallelism. \par
+The final exam will be to implement both pipeline parallelisms, run evaluation benchmarks on motivating examples by different combinations of parallel strategies. 
+
+
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-sigplan.tex'.
