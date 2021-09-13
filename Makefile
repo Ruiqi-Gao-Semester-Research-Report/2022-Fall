@@ -11,7 +11,7 @@ PACKAGE=acmart
 
 PDF = $(PACKAGE).pdf acmguide.pdf
 
-all:  ${PDF} ALLSAMPLES
+all:  ALLSAMPLES
 
 
 %.pdf:  %.dtx   $(PACKAGE).cls
@@ -37,42 +37,26 @@ acmguide.pdf: $(PACKAGE).dtx $(PACKAGE).cls
 
 
 ALLSAMPLES:
-	cd samples; pdflatex samples.ins; cd ..
-	for texfile in samples/*.tex; do \
+	cd proposal; cd ..
+	for texfile in proposal/*.tex; do \
 		pdffile=$${texfile%.tex}.pdf; \
 		${MAKE} $$pdffile; \
 	done
 
-samples/%: %
-	cp $^ samples
+proposal/%: %
+	cp $^ proposal
 
 
-samples/$(PACKAGE).cls: $(PACKAGE).cls
-samples/ACM-Reference-Format.bst: ACM-Reference-Format.bst
+proposal/$(PACKAGE).cls: $(PACKAGE).cls
+proposal/ACM-Reference-Format.bst: ACM-Reference-Format.bst
 
-samples/%.pdf:  samples/%.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst
+proposal/%.pdf:  proposal/%.tex   proposal/$(PACKAGE).cls proposal/ACM-Reference-Format.bst
 	cd $(dir $@) && pdflatex-dev $(notdir $<)
 	- cd $(dir $@) && bibtex $(notdir $(basename $<))
 	cd $(dir $@) && pdflatex-dev $(notdir $<)
 	cd $(dir $@) && pdflatex-dev $(notdir $<)
 	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
 	  do cd $(dir $@) && pdflatex-dev $(notdir $<); done
-
-samples/sample-xelatex.pdf:  samples/sample-xelatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst
-	cd $(dir $@) && xelatex-dev $(notdir $<)
-	- cd $(dir $@) && bibtex $(notdir $(basename $<))
-	cd $(dir $@) && xelatex-dev $(notdir $<)
-	cd $(dir $@) && xelatex-dev $(notdir $<)
-	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do cd $(dir $@) && xelatex-dev $(notdir $<); done
-
-samples/sample-lualatex.pdf:  samples/sample-lualatex.tex   samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst
-	cd $(dir $@) && lualatex-dev $(notdir $<)
-	- cd $(dir $@) && bibtex $(notdir $(basename $<))
-	cd $(dir $@) && lualatex-dev $(notdir $<)
-	cd $(dir $@) && lualatex-dev $(notdir $<)
-	while ( grep -q '^LaTeX Warning: Label(s) may have changed' $(basename $<).log) \
-	  do cd $(dir $@) && lualatex-dev $(notdir $<); done
 
 
 
@@ -84,18 +68,18 @@ docclean:
 	*.ilg *.ind *.out *.lof \
 	*.lot *.bbl *.blg *.gls *.cut *.hd \
 	*.dvi *.ps *.thm *.tgz *.zip *.rpi \
-	samples/$(PACKAGE).cls samples/ACM-Reference-Format.bst \
-	samples/*.log samples/*.aux samples/*.out \
-	samples/*.bbl samples/*.blg samples/*.cut 
+	proposal/$(PACKAGE).cls proposal/ACM-Reference-Format.bst \
+	proposal/*.log proposal/*.aux proposal/*.out \
+	proposal/*.bbl proposal/*.blg proposal/*.cut \
+	proposal/*.fdb_latexmk proposal/*.fls proposal/*.gz
 
 
 
 clean: docclean
-	$(RM)  $(PACKAGE).cls \
-	samples/*.tex
+	$(RM)  $(PACKAGE).cls
 
 distclean: clean
-	$(RM)  *.pdf samples/sample-*.pdf
+	$(RM)  *.pdf proposal/*.pdf
 
 #
 # Archive for the distribution. Includes typeset documentation
@@ -107,6 +91,6 @@ zip:  all clean
 	zip -r  $(PACKAGE).zip * -x '*~' -x '*.tgz' -x '*.zip' -x CVS -x 'CVS/*'
 
 documents.zip: all docclean
-	zip -r $@ acmart.pdf acmguide.pdf samples *.cls ACM-Reference-Format.*
+	zip -r $@ acmart.pdf acmguide.pdf proposal *.cls ACM-Reference-Format.*
 
 .PHONY: all ALLSAMPLES docclean clean distclean archive zip

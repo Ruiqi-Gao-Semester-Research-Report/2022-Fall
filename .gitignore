@@ -30,3 +30,4 @@ proposal/project-proposal.pdf
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+proposal/ACM-Reference-Format.bst
