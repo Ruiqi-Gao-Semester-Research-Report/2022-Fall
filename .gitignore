@@ -2,6 +2,7 @@ acmart.cls
 acmart.pdf
 acmguide.pdf
 proposal/project-proposal.pdf
+.vscode
 *.log
 *.aux
 *.cfg

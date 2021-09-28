@@ -5,17 +5,17 @@
 %% The original source files were:
 %%
 %% samples.dtx  (with options: `sigplan')
-%% 
+%%
 %% IMPORTANT NOTICE:
-%% 
+%%
 %% For the copyright see the source file.
-%% 
+%%
 %% Any modified versions of this file must be renamed
 %% with new filenames distinct from sample-sigplan.tex.
-%% 
+%%
 %% For distribution of the original source see the terms
 %% for copying and modification in the file samples.dtx.
-%% 
+%%
 %% This generated file may be distributed as long as the
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
@@ -35,7 +35,8 @@
 %%
 %%
 %% The first command in your LaTeX source must be the \documentclass command.
-\documentclass[sigplan,nonacm]{acmart}
+%%\documentclass[sigplan,nonacm]{acmart}
+\documentclass[sigplan]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
 
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
@@ -50,6 +51,13 @@
 %% complete the rights form.
 %%\setcopyright{acmcopyright}
 \setcopyright{none}
+\acmJournal{PACMPL}
+\acmVolume{1}
+\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
+\acmArticle{1}
+\acmYear{2021}
+\acmMonth{9}
+\acmDOI{}
 %%\copyrightyear{2018}
 %%\acmYear{2018}
 %%\acmDOI{10.1145/1122445.1122456}
@@ -85,11 +93,12 @@
 %%
 %% end of the preamble, start of the body of the document source.
 \begin{document}
+\sloppy
 
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{CS59200 Research Proposal}
+\title{Parallel training by Pipeline Execution In AIRCoP}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -122,8 +131,8 @@
 %% article.
 \begin{abstract}
 Various approaches have been developed like data parallelism, model parallelism, attribute parallelism, and pipeline parallelism to train machine learning models in parallel, however, there are no existing frameworks that can integrate these approaches together. Most commonly used machine learning frameworks such as TensorFlow and Pytorch only support a very small subset of parallel paradigms - the data parallelism and model parallelism. GPipe and PipeDream support different types of pipeline parallelism by dividing the model into several modules and run them in a pipeline fashion.
-AIRCop(Abstract IR for Comprehensive Parallelization) is a developing project that unifies all the parallelism paradigms mentioned above. Since all the machine learning models can be viewed as computation graphs, the parallelism paradigms (data parallelism, model parallelism, attribute parallelism, and pipeline parallelism) are just different kinds of computation graph transformation, ie transformation pass. AIRCop uses this idea and takes a machine learning model(basic sequential model) and parallelization annotations (describe the desired parallel behavior) as input and generates target program through different transformation passes.
-	
+AIRCop (Abstract IR for Comprehensive Parallelization) is a developing project that unifies all the parallelism paradigms mentioned above. Since all the machine learning models can be viewed as computation graphs, the parallelism paradigms (data parallelism, model parallelism, attribute parallelism, and pipeline parallelism) are just different kinds of computation graph transformation, ie transformation pass. AIRCop uses this idea and takes a machine learning model (basic sequential model) and parallelization annotations (describe the desired parallel behavior) as input and generates target program through different transformation passes.
+
 \end{abstract}
 
 %%
@@ -145,29 +154,27 @@ AIRCop(Abstract IR for Comprehensive Parallelization) is a developing project th
 \maketitle
 
 \section{Objective}
-I am trying to implement pipeline parallelism into a Parallelism Machine learning framework-AIRCop. If the project is done, AIRCop will be the first Machine learning framework that can integrate all parallel paradigms and users can have a deeper insight into parallel training design.
+We are going to implement pipeline parallelism into a Parallelism Machine learning framework-AIRCop. If the project is done, AIRCop will be the first Machine learning framework that can integrate all parallel paradigms and users can have a deeper insight into parallel training design.
 
 \section{Current Work}
-There are currently several parallel strategies to run large models: Spatial Partition(data parallelism, model parallelism) and Pipelined Execution. Spatial Partition divides the computation of machine learning operations among different devices and runs them simultaneously. Pipelined Execution runs multiple batches of data in a pipelined fashion.\par
- Spatial Partition is implemented in well-known machine learning frameworks like Tensorflow and Pytorch. GPipe and PipeDream support different kinds of pipeline parallelism. While Spatial Partition enables the model to be trained among multiple devices simultaneously each with a fraction of data, It will require a large number of device communication between operations and will result in inter-device tensor communication overhead. This turns out to be the bottleneck for parallel training on GPU clusters (group of devices) where inter-cluster communication does not have high bandwidth. Pipeline Execution is a better strategy for parallel training among clusters because it divides the model into several modules, runs different modules simultaneously in a pipelined fashion, and only requires tensor communication between modules. \par 
- It will be ideal for large GPU clusters to use Spatial Partition inside the cluster(where devices have high-bandwidth connections) and Pipeline Execution between different clusters(with little communication overhead). However, there is currently no machine learning framework that can integrate both Spatial Partition and Pipeline Execution. 
+There are currently several parallel strategies to run large models: Spatial Partition (data parallelism, model parallelism) and Pipelined Execution. Spatial Partition divides the computation of machine learning operations among different devices and runs them simultaneously. Pipelined Execution runs multiple batches of data in a pipelined fashion.\par
+ Spatial Partition is implemented in well-known machine learning frameworks like Tensorflow and Pytorch. GPipe and PipeDream support different kinds of pipeline parallelism. While Spatial Partition enables the model to be trained among multiple devices simultaneously each with a fraction of data, It will require a large number of device communication between operations and will result in inter-device tensor communication overhead. This turns out to be the bottleneck for parallel training on GPU clusters (group of devices) where inter-cluster communication does not have high bandwidth. Pipeline Execution is a better strategy for parallel training among clusters because it divides the model into several modules, runs different modules simultaneously in a pipelined fashion, and only requires tensor communication between modules. \par
+ It will be ideal for large GPU clusters to use Spatial Partition inside the cluster (where devices have high-bandwidth connections) and Pipeline Execution between different clusters (with little communication overhead). However, there is currently no machine learning framework that can integrate both Spatial Partition and Pipeline Execution.
 \section{Innovation}
-My project focuses on implementing pipeline parallelism on the AIRCop framework, thus enables AIRCop to be the first framework that can explore the full power of different Parallelism Paradigms. \par 
+My project focuses on implementing pipeline parallelism on the AIRCop framework, thus enables AIRCop to be the first framework that can explore the full power of different Parallelism Paradigms. \par
  AIRCop also develops a formal language to describe the model as a computation graph, and the corresponding transformation procedure for generating the target parallel program for different parallelism paradigms. AIRCop comes with an annotation system for the user to specify what kind of Parallelism Paradigms they want to use: Spatial Partition annotation for operations and Pipelined Execution annotation for modules. Users can explore comprehensive parallel training by adding different annotations to the source model.
  \section{Implementation and Risk}
  The key idea to implement pipeline parallelism in AIRCop is to realize the corresponding computation graph transformation pass for different pipeline strategies and come up with an annotation system to represent different pipeline strategies.\par
- The risk should be low because GPipe and Pipedream already separately implement different pipeline strategies as libraries and Spatial Partition is already implemented in AIRCop as a transformation pass. Because the choice of pipeline strategy is giving by the user using annotations, We only need to transform the source sequential model by changing the training loop of different modules and adding communication between modules while changing tensor's scope. Thus the risk should be low. However, it would still be possible that we might see no performance gains by combining Pipeline Execution and Spatial Partition than only using Spatial Partition. Anyway, integrating Pipeline Execution and Spatial Partition will give user flexibility to try different combinations of parallel strategies under different scenarios on a unified framework. This should lead to a deeper insight of parallel training.
+ The risk should be low because GPipe and Pipedream already separately implement different pipeline strategies as libraries and Spatial Partition is already implemented in AIRCop as a transformation pass. Because the choice of pipeline strategy is giving by the user using annotations, We only need to transform the source sequential model by changing the training loop of different modules and adding communication between modules while changing tensor's scope. Thus the risk should be low. However, it would still be possible that we might see no performance gains by combining Pipeline Execution and Spatial Partition than only using Spatial Partition. Anyway, integrating Pipeline Execution and Spatial Partition will give users some flexibility to try different combinations of parallel strategies under different scenarios on a unified framework. This should lead to a deeper insight of parallel training.
 \section{Examination and Success metric}
 \begin{itemize}
-  \item The first step is to formally describe stacked pipeline(GPipe's strategy) and queued pipeline(PipeDream's strategy) as transformation passes in the formal language of AIRCop, and decides the annotation system for the user to specify the strategy in the source program. By the mean time, I would need to get familiar with LMS framework and study the Spatial Partition Implementation in AIRCop. This should be done by 9/30. 
+  \item The first step is to formally describe stacked pipeline (GPipe's strategy) and queued pipeline (PipeDream's strategy) as transformation passes in the formal language of AIRCop, and decides the annotation system for the user to specify the strategy in the source program. I would need to get familiar with LMS framework and study the Spatial Partition Implementation in AIRCop. This should be done by 9/30.
   \item The mid-term exam will be to implement stacked pipeline inside LMS compiler as a transformation pass for single pipeline parallelism. This should be done by 10/30.
   \item The final exam will be to implement both pipeline parallelisms, run evaluation benchmarks on motivating examples by different combinations of parallel strategies. This should be done by 11/30.
-  \item The final report writing and presentation preparation will be done in the remaining time of the semester. 
+  \item The final report writing and presentation preparation will be done in the remaining time of the semester.
 \end{itemize}
 
 
 
 \end{document}
 \endinput
-%%
-%% End of file `sample-sigplan.tex'.

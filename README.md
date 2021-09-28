@@ -2,9 +2,9 @@
 
 ## To compile the latex file, run:
 ```bash
-make 
+make
 ```
-in the root folder, and the generated pdf file will be ``proposal/project-proposal.pdf``
+in the root folder, and the generated pdf file will be ``proposal/build/proposal.pdf`` and ``report/build/paper.pdf``
 
 
 ## To delete all the file generated during latex compilation, run:
