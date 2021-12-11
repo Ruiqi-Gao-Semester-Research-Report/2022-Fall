@@ -31,4 +31,7 @@ proposal/project-proposal.pdf
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+*.pdf
+report/*.pdf
+proposal/*.pdf
 proposal/ACM-Reference-Format.bst
