@@ -145,7 +145,8 @@ In section \ref{introduction}, we introduce parallel training, different existin
 In section \ref{pipelineparallism}, we further study stacked pipeline - the pipeline parallelism we support in AIRCoP.\par
 In section \ref{formalpipe}, we show the formal description of the training loop transformation for pipeline parallelism.\par
 In section \ref{implementation}, we present the implementation detail of our work.\par
-In section \ref{evaluation}, we present a parallel training evaluation with different parallelism settings to illustrate the flexibility of our framework.
+In section \ref{evaluation}, we present a parallel training evaluation with different parallelism settings to illustrate the flexibility of our framework.\par
+In section \ref{conclusion}, we summarize our progress and draw some conclusions.
 \section{Introduction} \label{introduction}
  Real-world machine learning applications are usually tremendous. They require a tremendous amount of data for training and can not work on a single device. As a result, various parallel strategies have been proposed for running large models in parallel among multiple distributed devices to achieve optimal performance.\par
  \subsection{Spatial Partition}There are different kinds of parallelism strategies, the most common one is Data parallelism\cite{krizhevsky2012imagenet}, where we split input across multiple devices and maintain the same network weight. Data parallelism is adapted and developed by most modern machine learning framework (TensorFlow\cite{abadi2016tensorflow}, Pytorch\cite{paszke2019pytorch}). Data parallelism requires network weight synchronizations between devices at the end of each iteration. Therefore Data parallelism is ideal for a computation-intensive network with few weight parameters (convolution and pooling layer) but will introduce significant communication overhead for a network with a large number of weight parameters (fully-connected layer). Model parallelism\cite{dean2012large} is achieved by splitting the network weight tensor across devices while broadcasting the input tensor. Model parallelism reduces the communication overhead of Data Parallelism but is rarely used because there are often dependencies between network layers. Attribute parallelism\cite{jia2019beyond} can partition the attribute dimension in both input and weight parameters and require collective communication like AllReduce between operations. An experienced developer can combine different Parallelism strategies to achieve optimal performance. For example, \cite{krizhevsky2014one} uses data parallelism for the convolution layer and model parallelism for the fully-connected layer. The above parallelism strategies can be categorized as Spatial Partition because they are based on the partition for data/weight/operation. \par
@@ -172,8 +173,6 @@ In section \ref{evaluation}, we present a parallel training evaluation with diff
   s \in Symbol& \quad n  \in \mathbb{N} \\
   size \in Size& :=\mathcal{S}(dim:Symbol,length:\mathbb{N})\\
   tt\in TensorType& := \mathcal{T}(shape:List[Size])\\
-%\end{align*}
-%\begin{align*}
   \textbf{OperationType}:& \\
   mem\_op\in MemoryOp& := Weight \text{ } | \text{ } Input \text{ } | \text{ } Zero \text{ } | \text{ } One \text{ } \dots \\
   ml\_op \in MLOP& := MatMul \text{ } | \text{ } Conv \text{ } | \text{ } AvgPool \text{ }\text{ } | \dots \\
@@ -193,14 +192,14 @@ In section \ref{evaluation}, we present a parallel training evaluation with diff
  Pipeline Parallelism is ideal for distributed training workload across several nodes with weak inter-connection. Using Spatial Partition across different nodes will cause significant communication overhead between each operation. Splitting the training models into several modules and assigning each module to different nodes will limit the inter-node communication to the boundary of each module, therefore significantly reducing the inter-node communication overhead.\par
  \begin{figure}[htbp]
   \centering
-  \includegraphics[scale=0.3]{NormalPipeline}
+  \includegraphics[scale=0.4]{NormalPipeline}
   \caption{Naive multiple modules}
   \label{fig:multiplemodule}
 \end{figure}
  Simply splitting modules will cause large amount of stall time (or bubble time) due to complex dependencies between the sequential modules. As shown in Figure \ref{fig:multiplemodule}, if we naively spilt the model into 4 modules $m_0,m_1,m_2,m_3$. There will be sequential dependencies between the forward pass $F_0, F_1, F_2, F_3$ of modules $m_0,m_1,m_2,m_3$, and reverse dependencies between backward pass $B_3, B_2, B_1, B_0$. The dependencies between the forward pass and backward pass will force strict ordering between modules, introduce synchronizations between module boundaries, and cause significant idle time on 4 devices. \par
  \begin{figure}[htbp]
   \centering
-  \includegraphics[scale=0.4]{stackedpipeline}
+  \includegraphics[scale=0.45]{stackedpipeline}
   \caption{Pipeline Parallelism}
   \label{fig:stackedpipeline}
 \end{figure}
@@ -243,7 +242,7 @@ Assume we have $\epsilon$ pipelines. The target program will have a top-level tr
 %\end{align*}
 Transformation for pipeline parallelism has 2 stages; \textbf{Collection Phase} and \textbf{Generation Phase}. The Collection Phase collects the necessary information like forward/backward operation. The Generation Phase uses the collected information and the module annotation to generate the training loop.\par
 \paragraph{Collection Phase}
-During Collection Phase we need to collect the weight operations $E_w$, forward operations $E_f$ and backward operations $E_b$. For pipeline parallelism, we will add send/recv into $E_f$ and $E_b$ to maintain the data dependencies between modules. The corresponding variables of the operation is $xs^w$, $xs^f$, $xs^b$. We also need to calculate the lift variables $xs^l = Defined(E_f) \bigcap Used(E_b)$, the lifted variables $xs^l$ are the variables defined in the forward pass and used in the backward pass. Because we are generating different loops for forward passes and backward passes of micro-batches, we need to lift $xs^l$ into the outer scope and keep multiple versions of those variables for different micro-batches.\par
+During Collection Phase we need to collect the weight operations $E_w$, forward operations $E_f$ and backward operations $E_b$. For pipeline parallelism, we will add send/recv into $E_f$ and $E_b$ to maintain the data dependencies between modules. The corresponding variables of the operation is $xs^w$, $xs^f$, $xs^b$. We also need to calculate the lift variables $$xs^l = Defined(E_f) \bigcap Used(E_b)$$, the lifted variables $xs^l$ are the variables defined in the forward pass and used in the backward pass. Because we are generating different loops for forward passes and backward passes of micro-batches, we need to lift $xs^l$ into the outer scope and keep multiple versions of those variables for different micro-batches.\par
 \paragraph{Generation Phase}
 The formal description of the Generation Phase is as follows:
 \begin{align*}
