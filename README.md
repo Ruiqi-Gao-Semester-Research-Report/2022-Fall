@@ -19,3 +19,7 @@ This document requires a full texlive distribution that can be installed by runn
 `apt-get install texlive-full` in the terminal. Because `texlive-full` is very
 large (about 5 Gigabytes) you can also install the smaller texlive bundles and
 add any missing packages manually.
+
+## Anaconda
+
+The script to generate the evaluation plot requires Anaconda environment. Please activate the conda environment before `make`

@@ -1,0 +1,6 @@
+Setting,Runtime
+Data Parallism (2 GPU),19.894
+Data Parallism (4 GPU),10.062
+Mixed Parallism (no pipeline),19.734
+Mixed Parallism (4 pipelines),12.437
+Mixed Parallism (8 pipelines),11.237
