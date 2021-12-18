@@ -4,9 +4,6 @@ import matplotlib.ticker as mtick
 
 
 if __name__=="__main__":
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    import seaborn as sns
 
     # Load data
     df = pd.read_csv('../data/benchmark.csv', index_col=0)
